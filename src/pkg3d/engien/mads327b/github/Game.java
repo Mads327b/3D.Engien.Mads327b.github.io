@@ -25,10 +25,10 @@ import static javax.swing.WindowConstants.HIDE_ON_CLOSE;
  *
  * @author Mads327b
  */
-public class Game extends Canvas implements Runnable{
+public final class Game extends Canvas implements Runnable{
     Thread t;
     boolean runing = false;
-    Logger logger = Logger.getLogger("3D-Engien");
+    static final Logger logger = Logger.getLogger("3D-Engien");
     ArrayList<Double> 
             FPS = new ArrayList<>(),
             TPS = new ArrayList<>();
@@ -52,11 +52,11 @@ public class Game extends Canvas implements Runnable{
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             File file = new File("Logs/"+sdf.format(cal.getTime())+".log");
-            FileHandler fh = null;
+            FileHandler fh;
             String fLog = "Creating Log";
             if(file.exists()){
                 fh = new FileHandler(file.getPath(),true);
-                fLog = "\n\nopen Log";
+                fLog = "open Log";
             }else
                 fh = new FileHandler(file.getPath());
             logger.addHandler(fh);
@@ -89,7 +89,7 @@ public class Game extends Canvas implements Runnable{
             {
 //                e.getWindow().hide();
                 runing = false;
-                logger.info("Stopping system");
+                logger.info("*--------Stopping system--------*\n\n\n\n");
                 try {
                     t.join();
                 } catch (InterruptedException ex) {
@@ -137,12 +137,12 @@ public class Game extends Canvas implements Runnable{
                 for (double i : this.TPS) {
                     sum2 += i;
                 }
-                logger.info("average TPS in the last "+CALM.dicimal(time,2)+"s.\tis: "+(int)CALM.dicimal(sum2/this.TPS.size(),0)+"("+this.TPS.size()+")");
-                logger.info("average FPS in the last "+CALM.dicimal(time,2)+"s.\tis: "+(int)CALM.dicimal(sum/this.FPS.size(),0)+"("+this.FPS.size()+")");
+                logger.log(Level.INFO, "Average TPS in the last {0}s.\tis: {1}({2})", new Object[]{CALM.dicimal(time,2), (int)CALM.dicimal(sum2/this.TPS.size(),0), this.TPS.size()});
+                logger.log(Level.INFO, "Average FPS in the last {0}s.\tis: {1}({2})", new Object[]{CALM.dicimal(time,2), (int)CALM.dicimal(sum/this.FPS.size(),0), this.FPS.size()});
                 
                 this.FPS.clear();
                 this.TPS.clear();
-                lastTime = now;
+                lastTime = System.nanoTime();
             }
         }
     }
