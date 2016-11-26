@@ -34,8 +34,9 @@ public final class Game extends Canvas implements Runnable{
             TPS = new ArrayList<>();
     Handler handler;
     double 
-            fpsLMT = 60,
-            tpsLMT = 180;
+            fpsLMT = 60, //how many frames there can be in a secend.
+            tpsLMT = 180,  //how many updates there can be in a secend.
+            saveLog = 10; //saveing fps and tps in (x)s.
     public static void main(String[] args) { 
         new Game();
         
@@ -103,6 +104,8 @@ public final class Game extends Canvas implements Runnable{
         logger.info("Starting Engien");
         handler = new Handler(this);
         runing = true;
+        addKeyListener(new KL(this));
+        requestFocus();
         t = new Thread(this,"3D-Engien");
         t.start();
     }
@@ -128,17 +131,14 @@ public final class Game extends Canvas implements Runnable{
                 lastFPS = now;
                 handler.render();
             }
-            if(time >= 10){
+            if(time >= saveLog){
                 double sum = 0;
-                for (double i : this.FPS) {
-                    sum += i;
-                }
+                sum = this.FPS.stream().map((i) -> i).reduce(sum, (accumulator, _item) -> accumulator + _item);
                 double sum2 = 0;
-                for (double i : this.TPS) {
-                    sum2 += i;
-                }
-                logger.log(Level.INFO, "Average TPS in the last {0}s.\tis: {1}({2})", new Object[]{CALM.dicimal(time,2), (int)CALM.dicimal(sum2/this.TPS.size(),0), this.TPS.size()});
-                logger.log(Level.INFO, "Average FPS in the last {0}s.\tis: {1}({2})", new Object[]{CALM.dicimal(time,2), (int)CALM.dicimal(sum/this.FPS.size(),0), this.FPS.size()});
+                sum2 = this.TPS.stream().map((i) -> i).reduce(sum2, (accumulator, _item) -> accumulator + _item);
+                String log = "\tAverage TPS in the last "+CALM.dicimal(time,2)+"s.\tis: "+(int)CALM.dicimal(sum2/this.TPS.size(),0)+"("+this.TPS.size()+")\n"
+                        +  "\t\tAverage FPS in the last "+CALM.dicimal(time,2)+"s.\tis: "+(int)CALM.dicimal(sum/this.FPS.size(),0)+"("+this.FPS.size()+")";
+                logger.info(log);
                 
                 this.FPS.clear();
                 this.TPS.clear();
